@@ -4,22 +4,25 @@ public class DigitalWallet {
 
     private double balance;
 
+    private final Object depositLock = new Object();
+    private final Object withdrawLock = new Object();
+    private final Object balanceLock = new Object();
+
     public DigitalWallet(double balance) {
         this.balance = balance;
     }
 
     public void deposit (double amount) {
-        synchronized (this) {
+        // At the same time != parallel - CPU Time Slicing
+        synchronized (depositLock) {
             balance += amount;
         }
-        // System.out.println(Thread.currentThread().getName() + " deposited: " + amount);
     }
 
     public void withdraw (double amount) {
-        synchronized (this) {
+        synchronized (withdrawLock) {
             if (balance >= amount) {
                 balance -= amount;
-                // System.out.println(Thread.currentThread().getName() + " withdrew: " + amount);
             } else {
                 System.out.println(Thread.currentThread().getName() + " insufficient funds.");
             }
@@ -28,7 +31,7 @@ public class DigitalWallet {
     }
 
     public double getBalance() {
-        synchronized (this) {
+        synchronized (balanceLock) {
             return balance;
         }
     }
