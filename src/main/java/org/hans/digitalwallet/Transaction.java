@@ -1,7 +1,9 @@
 package org.hans.digitalwallet;
 
+import org.hans.digitalwallet.services.DigitalWalletService;
+
 record Transaction (
-        DigitalWallet digitalWallet,
+        DigitalWalletService digitalWallet,
         double amount,
         Operation operation
 ) implements Runnable {

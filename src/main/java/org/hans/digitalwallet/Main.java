@@ -1,11 +1,12 @@
 package org.hans.digitalwallet;
 
 import org.hans.digitalwallet.repositories.AccountRepository;
+import org.hans.digitalwallet.services.DigitalWalletService;
 
 public class Main {
 
     private static void processTransactions () {
-        DigitalWallet digitalWallet = new DigitalWallet(2500);
+        DigitalWalletService digitalWallet = new DigitalWalletService(2500);
 
         Thread transactionPaymentCourse = new Thread(new Transaction(digitalWallet, 100, Transaction.Operation.DEPOSIT));
         Thread transactionCoachEnglish = new Thread(new Transaction(digitalWallet, 100, Transaction.Operation.DEPOSIT));

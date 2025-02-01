@@ -1,6 +1,6 @@
-package org.hans.digitalwallet;
+package org.hans.digitalwallet.services;
 
-public class DigitalWallet {
+public class DigitalWalletService {
 
     private double balance;
 
@@ -8,7 +8,7 @@ public class DigitalWallet {
     private final Object withdrawLock = new Object();
     private final Object balanceLock = new Object();
 
-    public DigitalWallet(double balance) {
+    public DigitalWalletService(double balance) {
         this.balance = balance;
     }
 
