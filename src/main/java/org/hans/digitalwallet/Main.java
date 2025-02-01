@@ -1,5 +1,7 @@
 package org.hans.digitalwallet;
 
+import org.hans.digitalwallet.repositories.AccountRepository;
+
 public class Main {
 
     private static void processTransactions () {
@@ -30,8 +32,19 @@ public class Main {
         System.out.println("Get Balance end " + digitalWallet.getBalance());
     }
 
+    private static void validateSingletonThreadSafe () {
+        for (int i = 0; i < 10; i++) {
+            new Thread(() -> {
+                AccountRepository repo = AccountRepository.getInstance();
+                System.out.println("Hash " + repo.hashCode());
+            }).start();
+        }
+    }
+
     public static void main(String[] args) {
         for (int i = 0; i < 20; i++) processTransactions();
+
+        validateSingletonThreadSafe();
     }
 
 }

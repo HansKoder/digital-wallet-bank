@@ -9,14 +9,8 @@ record Transaction (
     @Override
     public void run() {
         switch (operation) {
-            case DEPOSIT -> {
-                digitalWallet.deposit(amount);
-                // System.out.println("Amount " + digitalWallet.getBalance());
-            }
-            case WITHDRAW -> {
-                digitalWallet.withdraw(amount);
-                // System.out.println("Amount " + digitalWallet.getBalance());
-            }
+            case DEPOSIT -> digitalWallet.deposit(amount);
+            case WITHDRAW -> digitalWallet.withdraw(amount);
         }
     }
 
