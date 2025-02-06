@@ -1,24 +1,27 @@
 package org.hans.digitalwallet;
 
+import org.hans.digitalwallet.exceptions.InsufficientFundsException;
+import org.hans.digitalwallet.models.Credential;
 import org.hans.digitalwallet.services.DigitalWalletService;
 
 public class Main {
 
     private static void processTransactions () {
         DigitalWalletService service = new DigitalWalletService();
+        Credential credential = new Credential("512", "doe", "123");
 
         Thread doeWithDraw = new Thread(() -> {
             try {
-                service.withdraw("512", 21.0);
-            } catch (InterruptedException e) {
+                service.withdraw(credential, 21.0);
+            } catch (InterruptedException | InsufficientFundsException e) {
                 throw new RuntimeException(e);
             }
         }, "doeWithDraw");
 
         Thread doeWithDraw2 = new Thread(() -> {
             try {
-                service.withdraw("512", 13.0);
-            } catch (InterruptedException e) {
+                service.withdraw(credential, 13.0);
+            } catch (InterruptedException | InsufficientFundsException e) {
                 throw new RuntimeException(e);
             }
         }, "doeWithdraw2");
@@ -29,7 +32,7 @@ public class Main {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            service.deposit("512", 5.0);
+            service.deposit(credential, 5.0);
         }, "doeDeposit");
 
         Thread doeDeposit2 = new Thread(() -> {
@@ -38,7 +41,7 @@ public class Main {
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            service.deposit("512", 20.0);
+            service.deposit(credential, 20.0);
         }, "doeDeposit2");
 
         doeWithDraw.start();
@@ -46,7 +49,6 @@ public class Main {
 
         doeDeposit.start();
         doeDeposit2.start();
-
 
         try {
             doeWithDraw.join();
@@ -57,7 +59,7 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        System.out.println("Doe Final Balance " + service.getBalance("512"));
+        System.out.println("Doe Final Balance " + service.getBalance(credential));
     }
 
     public static void main(String[] args) {
