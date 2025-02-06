@@ -1,50 +1,42 @@
 package org.hans.digitalwallet;
 
-import org.hans.digitalwallet.repositories.AccountRepository;
+import org.hans.digitalwallet.exceptions.InsufficientFundsException;
+import org.hans.digitalwallet.models.Credential;
+import org.hans.digitalwallet.services.DigitalWalletService;
+import org.hans.digitalwallet.strategy.DepositStrategy;
+import org.hans.digitalwallet.strategy.WithDrawStrategy;
 
 public class Main {
 
     private static void processTransactions () {
-        DigitalWallet digitalWallet = new DigitalWallet(2500);
+        DigitalWalletService service = new DigitalWalletService();
+        Credential credential = new Credential("512", "doe", "123");
 
-        Thread transactionPaymentCourse = new Thread(new Transaction(digitalWallet, 100, Transaction.Operation.DEPOSIT));
-        Thread transactionCoachEnglish = new Thread(new Transaction(digitalWallet, 100, Transaction.Operation.DEPOSIT));
-        Thread transactionJobSalary = new Thread(new Transaction(digitalWallet, 800, Transaction.Operation.DEPOSIT));
-        Thread transactionBuyGroceries = new Thread(new Transaction(digitalWallet, 500, Transaction.Operation.WITHDRAW));
-        Thread transactionBuyTaxes = new Thread(new Transaction(digitalWallet, 500, Transaction.Operation.WITHDRAW));
+        Thread doeWithDraw = new Thread(new WithDrawStrategy(service, credential, 20.0), "doe-withdraw-1");
+        Thread doeWithDraw2 = new Thread(new WithDrawStrategy(service, credential, 13.0), "doe-withdraw-2");
 
-        transactionPaymentCourse.start();
-        transactionBuyTaxes.start();
-        transactionBuyGroceries.start();
-        transactionJobSalary.start();
-        transactionCoachEnglish.start();
+        Thread doeDeposit = new Thread(new DepositStrategy(service, credential, 5.0, 1000), "doe-deposit-1");
+        Thread doeDeposit2 = new Thread(new DepositStrategy(service, credential, 20.0, 2000), "doe-deposit-2");
+
+        doeWithDraw.start();
+        doeWithDraw2.start();
+        doeDeposit.start();
+        doeDeposit2.start();
 
         try {
-            transactionPaymentCourse.join();
-            transactionBuyTaxes.join();
-            transactionBuyGroceries.join();
-            transactionJobSalary.join();
-            transactionCoachEnglish.join();
-        } catch (InterruptedException interruptedException) {
-            System.err.println(interruptedException.getMessage());
+            doeWithDraw.join();
+            doeWithDraw2.join();
+            doeDeposit.join();
+            doeDeposit2.join();
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
 
-        System.out.println("Get Balance end " + digitalWallet.getBalance());
-    }
-
-    private static void validateSingletonThreadSafe () {
-        for (int i = 0; i < 10; i++) {
-            new Thread(() -> {
-                AccountRepository repo = AccountRepository.getInstance();
-                System.out.println("Hash " + repo.hashCode());
-            }).start();
-        }
+        System.out.println("Final Balance " + service.getBalance(credential));
     }
 
     public static void main(String[] args) {
-        for (int i = 0; i < 20; i++) processTransactions();
-
-        validateSingletonThreadSafe();
+        processTransactions();
     }
 
 }
