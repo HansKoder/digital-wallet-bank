@@ -1,7 +1,6 @@
 package org.hans.digitalwallet.services;
 
 import org.hans.digitalwallet.exceptions.InsufficientFundsException;
-import org.hans.digitalwallet.exceptions.InvalidTransactionException;
 import org.hans.digitalwallet.models.Account;
 import org.hans.digitalwallet.models.Credential;
 import org.hans.digitalwallet.repositories.AccountRepository;
@@ -30,7 +29,7 @@ public class DigitalWalletService {
 
         synchronized (account) {
             while (account.insufficientFunds(amount)) {
-                System.out.println(Thread.currentThread().getName() + " insufficientFunds - wait until new deposits");
+                System.out.println(Thread.currentThread().getName() + " Insufficient Funds - wait until a new deposit");
                 System.out.println("-".repeat(100));
                 account.wait();
             }
