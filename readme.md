@@ -27,4 +27,4 @@ Developing this backend will help solidify skills in creating scalable and resil
 - **synchronized**
 - **customs-locks**
 - **singleton-holder-pattern**
-
+- **wait-notify**
