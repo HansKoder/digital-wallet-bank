@@ -1,5 +1,9 @@
 package org.hans.digitalwallet.models;
 
+import org.hans.digitalwallet.exceptions.InsufficientFundsException;
+
+import java.security.InvalidParameterException;
+
 public final class Account {
 
     private final String uuid;
@@ -16,6 +20,21 @@ public final class Account {
 
     public boolean checkAccount (String user, String pass) {
         return this.user.equals(user) && this.pass.equals(pass);
+    }
+
+    public void withDraw (double amount) throws InsufficientFundsException {
+        if (amount <= 0) throw new InvalidParameterException("Amount must be greater than Zero (0)");
+
+        if (insufficientFunds(amount)) throw new InsufficientFundsException("Insufficient Funds!");
+
+        this.balance -= amount;
+    }
+
+
+    public void deposit (double amount) {
+        if (amount <= 0) throw new InvalidParameterException("Amount must be greater than Zero (0)");
+
+        this.balance += amount;
     }
 
     public boolean insufficientFunds (double amount) {
