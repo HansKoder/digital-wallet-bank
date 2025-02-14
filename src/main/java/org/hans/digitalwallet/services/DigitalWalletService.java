@@ -6,10 +6,16 @@ import org.hans.digitalwallet.models.Credential;
 import org.hans.digitalwallet.repositories.AccountRepository;
 
 import java.util.Optional;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DigitalWalletService {
 
     private final AccountRepository instance = AccountRepository.getInstance();
+
+    private final Lock lock = new ReentrantLock();
+    private final Condition condition = lock.newCondition();
 
     private Account validateAccount (Credential credential) {
         Optional<Account> accountExist = instance.getAccountByUUID(credential.accountId());
@@ -27,11 +33,13 @@ public class DigitalWalletService {
             throws InterruptedException, InsufficientFundsException {
         Account account = validateAccount(credential);
 
-        synchronized (account) {
+        lock.lock();
+
+        try {
             while (account.insufficientFunds(amount)) {
                 System.out.println(Thread.currentThread().getName() + " Insufficient Funds - wait until a new deposit");
                 System.out.println("-".repeat(100));
-                account.wait();
+                condition.await();
             }
 
             account.withDraw(amount);
@@ -40,12 +48,18 @@ public class DigitalWalletService {
                     + " Balance updated " + account.getBalance());
 
             System.out.println("-".repeat(100));
+        } finally {
+            lock.unlock();
         }
+
     }
 
     public void deposit (Credential credential, double amount) {
         Account account = validateAccount(credential);
-        synchronized (account) {
+
+        lock.lock();
+
+        try {
             account.deposit(amount);
             System.out.println(
                     Thread.currentThread().getName() +
@@ -53,14 +67,21 @@ public class DigitalWalletService {
                     + account.getBalance());
 
             System.out.println("-".repeat(100));
-            account.notifyAll();
+            condition.signalAll();
+        } finally {
+            lock.unlock();
         }
     }
 
     public double getBalance(Credential credential) {
         Account account = validateAccount(credential);
-        synchronized (account) {
+
+        lock.lock();
+
+        try {
             return account.getBalance();
+        } finally {
+            lock.unlock();
         }
     }
 
