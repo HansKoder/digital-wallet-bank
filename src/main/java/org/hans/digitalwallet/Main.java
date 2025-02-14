@@ -1,6 +1,5 @@
 package org.hans.digitalwallet;
 
-import org.hans.digitalwallet.exceptions.InsufficientFundsException;
 import org.hans.digitalwallet.models.Credential;
 import org.hans.digitalwallet.services.DigitalWalletService;
 import org.hans.digitalwallet.strategy.DepositStrategy;
