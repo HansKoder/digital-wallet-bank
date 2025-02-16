@@ -22,10 +22,10 @@ public final class Account {
         return this.user.equals(user) && this.pass.equals(pass);
     }
 
-    public void withDraw (double amount) throws InsufficientFundsException {
+    public void withDraw (double amount) {
         if (amount <= 0) throw new InvalidParameterException("Amount must be greater than Zero (0)");
 
-        if (insufficientFunds(amount)) throw new InsufficientFundsException("Insufficient Funds!");
+        if (insufficientFunds(amount)) throw new IllegalArgumentException("Insufficient Funds!");
 
         this.balance -= amount;
     }
